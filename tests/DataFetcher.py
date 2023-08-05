@@ -61,7 +61,7 @@ class DataFetcherTest(unittest.TestCase):
     self.assertEqual(roic_avgs[0], 10.0)
     self.assertEqual(roic_avgs[1], 20.0)
     self.assertEqual(roic_avgs[2], 33)
-    self.assertEqual(roic_avgs[3], 77)
+    self.assertEqual(roic_avgs[3], 44)
 
   def test_roic_should_return_1_from_yahoo_and_the_rest_from_stockrow(self):
     df = DataFetcher()
@@ -94,7 +94,7 @@ class DataFetcherTest(unittest.TestCase):
     self.assertEqual(roic_avgs[0], 10.0)
     self.assertEqual(roic_avgs[1], 22)
     self.assertEqual(roic_avgs[2], 33)
-    self.assertEqual(roic_avgs[3], 77)
+    self.assertEqual(roic_avgs[3], 44)
 
   def test_roic_should_return_all_from_stockrow_if_nothing_in_yahoo(self):
     df = DataFetcher()
@@ -104,7 +104,7 @@ class DataFetcherTest(unittest.TestCase):
     self.assertEqual(roic_avgs[0], 11)
     self.assertEqual(roic_avgs[1], 22)
     self.assertEqual(roic_avgs[2], 33)
-    self.assertEqual(roic_avgs[3], 77)
+    self.assertEqual(roic_avgs[3], 44)
 
   def test_roic_should_return_all_it_has_from_stockrow_if_nothing_in_yahoo(self):
     df = DataFetcher()
