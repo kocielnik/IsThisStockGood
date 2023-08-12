@@ -9,7 +9,7 @@ app_path = os.path.join(os.path.dirname(__file__), "..", 'src')
 sys.path.append(app_path)
 
 from src.YahooFinance import YahooFinanceQuoteSummary, YahooFinanceQuoteSummaryModule
-from src.DataFetcher import DataFetcher
+from src.DataFetcher import DataFetcher, fetchDataForTickerSymbol
 from src.StockRow import StockRowKeyStats
 
 class DataFetcherTest(unittest.TestCase):
@@ -112,3 +112,7 @@ class DataFetcherTest(unittest.TestCase):
     df.stockrow_key_stats.roic_averages = [11, 22]
     roic_avgs = df.get_roic_averages()
     self.assertEqual(len(roic_avgs), 2)
+
+  def test_should_fail(self):
+    data = fetchDataForTickerSymbol("MELI")
+    self.assertEqual(2500, data["sticker_price"])
