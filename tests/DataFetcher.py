@@ -116,3 +116,5 @@ class DataFetcherTest(unittest.TestCase):
   def test_should_fail(self):
     data = fetchDataForTickerSymbol("MELI")
     self.assertEqual(2500, data["sticker_price"])
+    # EPS TTM: 14.91
+    # P/E TTM: 93.01
