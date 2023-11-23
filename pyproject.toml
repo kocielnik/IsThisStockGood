@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "isthisstockgood"
+version = "0.1.0"
+description = ""
+authors = ["Patryk Kocielnik <patryk@kocielnik.pl>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+flask = "2.3.2"
+requests-futures = "1.0.0"
+lxml = "4.9.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
