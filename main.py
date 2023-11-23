@@ -1,7 +1,7 @@
 import logging
 from datetime import date
 from flask import Flask, request, render_template
-from src.DataFetcher import fetchDataForTickerSymbol
+from isthisstockgood.DataFetcher import fetchDataForTickerSymbol
 
 logger = logging.getLogger("IsThisStockGood")
 
