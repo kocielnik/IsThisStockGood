@@ -4,7 +4,7 @@ python data structures
 
 import json
 import logging
-import src.RuleOneInvestingCalculations as RuleOne
+import isthisstockgood.RuleOneInvestingCalculations as RuleOne
 import traceback
 
 # Stockrow does not seem to update their ticker symbols very promptly. This can be used

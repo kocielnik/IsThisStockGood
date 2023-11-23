@@ -5,7 +5,7 @@ python data structures
 
 import csv
 import logging
-import src.RuleOneInvestingCalculations as RuleOne
+import isthisstockgood.RuleOneInvestingCalculations as RuleOne
 import traceback
 
 

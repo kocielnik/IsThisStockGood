@@ -1,12 +1,12 @@
 import random
 import logging
-import src.RuleOneInvestingCalculations as RuleOne
+import isthisstockgood.RuleOneInvestingCalculations as RuleOne
 from requests_futures.sessions import FuturesSession
-from src.MSNMoney import MSNMoney
-from src.StockRow import StockRowKeyStats
-from src.YahooFinance import YahooFinanceAnalysis
-from src.YahooFinance import YahooFinanceQuote
-from src.YahooFinance import YahooFinanceQuoteSummary, YahooFinanceQuoteSummaryModule
+from isthisstockgood.MSNMoney import MSNMoney
+from isthisstockgood.StockRow import StockRowKeyStats
+from isthisstockgood.YahooFinance import YahooFinanceAnalysis
+from isthisstockgood.YahooFinance import YahooFinanceQuote
+from isthisstockgood.YahooFinance import YahooFinanceQuoteSummary, YahooFinanceQuoteSummaryModule
 from threading import Lock
 
 logger = logging.getLogger("IsThisStockGood")
