@@ -114,7 +114,10 @@ class DataFetcherTest(unittest.TestCase):
     self.assertEqual(len(roic_avgs), 2)
 
   def test_should_fail(self):
-    data = fetchDataForTickerSymbol("MELI")
+    ticker = "MELI"
+    data = fetchDataForTickerSymbol(ticker)
+    estimated_growth_url = "https://finance.yahoo.com/quote/"
+    f"{ticker}/analysis?p={ticker}"
     self.assertEqual(2500, data["sticker_price"])
     # EPS TTM: 14.91
     # P/E TTM: 93.01
