@@ -10,13 +10,13 @@ sys.path.append(app_path)
 
 from isthisstockgood.YahooFinance import YahooFinanceQuoteSummary, YahooFinanceQuoteSummaryModule
 from isthisstockgood.DataFetcher import DataFetcher, fetchDataForTickerSymbol
-from isthisstockgood.StockRow import StockRowKeyStats
+from isthisstockgood.financial_modeling_prep import FinancialModelingPrep
 
-class DataFetcherTest(unittest.TestCase):
+class TestDataFetcher(unittest.TestCase):
 
   def test_roic_should_return_1_3_from_yahoo_and_the_rest_from_stockrow(self):
     df = DataFetcher()
-    df.stockrow_key_stats = StockRowKeyStats('DUMMY')
+    df.stockrow_key_stats = FinancialModelingPrep('DUMMY')
     df.stockrow_key_stats.roic_averages = [11, 22, 33, 44, 55, 66, 77]
     modules = [
         YahooFinanceQuoteSummaryModule.incomeStatementHistory,
@@ -65,7 +65,7 @@ class DataFetcherTest(unittest.TestCase):
 
   def test_roic_should_return_1_from_yahoo_and_the_rest_from_stockrow(self):
     df = DataFetcher()
-    df.stockrow_key_stats = StockRowKeyStats('DUMMY')
+    df.stockrow_key_stats = FinancialModelingPrep('DUMMY')
     df.stockrow_key_stats.roic_averages = [11, 22, 33, 44, 55, 66, 77]
     modules = [
         YahooFinanceQuoteSummaryModule.incomeStatementHistory,
@@ -98,7 +98,7 @@ class DataFetcherTest(unittest.TestCase):
 
   def test_roic_should_return_all_from_stockrow_if_nothing_in_yahoo(self):
     df = DataFetcher()
-    df.stockrow_key_stats = StockRowKeyStats('DUMMY')
+    df.stockrow_key_stats = FinancialModelingPrep('DUMMY')
     df.stockrow_key_stats.roic_averages = [11, 22, 33, 44, 55, 66, 77]
     roic_avgs = df.get_roic_averages()
     self.assertEqual(roic_avgs[0], 11)
@@ -108,7 +108,7 @@ class DataFetcherTest(unittest.TestCase):
 
   def test_roic_should_return_all_it_has_from_stockrow_if_nothing_in_yahoo(self):
     df = DataFetcher()
-    df.stockrow_key_stats = StockRowKeyStats('DUMMY')
+    df.stockrow_key_stats = FinancialModelingPrep('DUMMY')
     df.stockrow_key_stats.roic_averages = [11, 22]
     roic_avgs = df.get_roic_averages()
     self.assertEqual(len(roic_avgs), 2)

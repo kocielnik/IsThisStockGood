@@ -3,7 +3,7 @@ import logging
 import isthisstockgood.RuleOneInvestingCalculations as RuleOne
 from requests_futures.sessions import FuturesSession
 from isthisstockgood.MSNMoney import MSNMoney
-from isthisstockgood.StockRow import StockRowKeyStats
+from isthisstockgood.financial_modeling_prep import FinancialModelingPrep
 from isthisstockgood.YahooFinance import YahooFinanceAnalysis
 from isthisstockgood.YahooFinance import YahooFinanceQuote
 from isthisstockgood.YahooFinance import YahooFinanceQuoteSummary, YahooFinanceQuoteSummaryModule
@@ -150,7 +150,7 @@ class DataFetcher():
     return session
 
   def fetch_stockrow_key_stats(self):
-    self.stockrow_key_stats = StockRowKeyStats(self.ticker_symbol)
+    self.stockrow_key_stats = FinancialModelingPrep(self.ticker_symbol)
     session = self._create_session()
     key_stat_rpc = session.get(self.stockrow_key_stats.key_stat_url, hooks={
        'response': self.parse_stockrow_key_stats,
