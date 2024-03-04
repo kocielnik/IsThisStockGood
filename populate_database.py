@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from src.Database import SQLite
-from IsThisStockGood.src.DataFetcher import fetchDataForTickerSymbol
+from IsThisStockGood.Database import SQLite
+from IsThisStockGood.DataFetcher import fetchDataForTickerSymbol
 import sys
 
 if __name__ == "__main__":
