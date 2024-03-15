@@ -5,12 +5,12 @@ import os
 import sys
 import unittest
 
-app_path = os.path.join(os.path.dirname(__file__), "..", 'src')
+app_path = os.path.join(os.path.dirname(__file__), "..", 'isthisstockgood')
 sys.path.append(app_path)
 
-from src.YahooFinance import YahooFinanceQuoteSummary, YahooFinanceQuoteSummaryModule
-from src.DataFetcher import DataFetcher
-from src.StockRow import StockRowKeyStats
+from isthisstockgood.DataProviders.YahooFinance import YahooFinanceQuoteSummary, YahooFinanceQuoteSummaryModule
+from isthisstockgood.DataFetcher import DataFetcher
+from isthisstockgood.DataProviders.StockRow import StockRowKeyStats
 
 class DataFetcherTest(unittest.TestCase):
 
@@ -22,7 +22,7 @@ class DataFetcherTest(unittest.TestCase):
         YahooFinanceQuoteSummaryModule.incomeStatementHistory,
         YahooFinanceQuoteSummaryModule.balanceSheetHistory
     ]
-    df.yahoo_finance_quote_summary = YahooFinanceQuoteSummary('DUMMY', modules)
+    df.yahoo_finance_quote_summary = YahooFinanceQuoteSummary('DUMMY')
     df.yahoo_finance_quote_summary.module_data = {
       'incomeStatementHistory' : {
         'incomeStatementHistory' : [
@@ -70,7 +70,7 @@ class DataFetcherTest(unittest.TestCase):
         YahooFinanceQuoteSummaryModule.incomeStatementHistory,
         YahooFinanceQuoteSummaryModule.balanceSheetHistory
     ]
-    df.yahoo_finance_quote_summary = YahooFinanceQuoteSummary('DUMMY', modules)
+    df.yahoo_finance_quote_summary = YahooFinanceQuoteSummary('DUMMY')
     df.yahoo_finance_quote_summary.module_data = {
       'incomeStatementHistory' : {
         'incomeStatementHistory' : [

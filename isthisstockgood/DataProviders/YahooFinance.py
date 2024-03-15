@@ -2,8 +2,8 @@ from enum import Enum
 import json
 import logging
 import re
-import IsThisStockGood.RuleOneInvestingCalculations as RuleOne
-from IsThisStockGood.DataProviders.Base import Base
+import isthisstockgood.RuleOneInvestingCalculations as RuleOne
+from isthisstockgood.DataProviders.Base import Base
 
 
 class YahooAutocomplete(Base):

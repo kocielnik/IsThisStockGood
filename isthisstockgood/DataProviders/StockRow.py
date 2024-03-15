@@ -4,9 +4,9 @@ python data structures
 
 import json
 import logging
-import IsThisStockGood.RuleOneInvestingCalculations as RuleOne
+import isthisstockgood.RuleOneInvestingCalculations as RuleOne
 import traceback
-from IsThisStockGood.DataProviders.Base import Base
+from isthisstockgood.DataProviders.Base import Base
 
 
 class StockRowKeyStats(Base):

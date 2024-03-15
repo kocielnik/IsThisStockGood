@@ -1,15 +1,15 @@
 import random
 import logging
 import sys
-import IsThisStockGood.RuleOneInvestingCalculations as RuleOne
+import isthisstockgood.RuleOneInvestingCalculations as RuleOne
 from requests_futures.sessions import FuturesSession
 from requests import Session
-from IsThisStockGood.DataProviders.MSNMoney import MSNMoneyKeyRatios, MSNMoneyKeyStats
-from IsThisStockGood.DataProviders.StockRow import StockRowKeyStats, StockRowPrice, StockRowName
-from IsThisStockGood.DataProviders.YahooFinance import YahooFinanceQuote,\
+from isthisstockgood.DataProviders.MSNMoney import MSNMoneyKeyRatios, MSNMoneyKeyStats
+from isthisstockgood.DataProviders.StockRow import StockRowKeyStats, StockRowPrice, StockRowName
+from isthisstockgood.DataProviders.YahooFinance import YahooFinanceQuote,\
 YahooFinanceQuoteSummary, YahooFinanceQuoteSummaryModule,\
 YahooAutocomplete
-from IsThisStockGood.Database import SQLite
+from isthisstockgood.Database import SQLite
 from threading import Lock
 
 def fetchDataForTickerSymbol(ticker, exchange=None):

@@ -1,8 +1,8 @@
 import json
 import sys
 import logging
-from IsThisStockGood.DataProviders.Base import Base
-import IsThisStockGood.RuleOneInvestingCalculations as RuleOne
+from isthisstockgood.DataProviders.Base import Base
+import isthisstockgood.RuleOneInvestingCalculations as RuleOne
 
 class MSNMoney(Base):
   AUTOCOMPLETE_URL = 'https://services.bingapis.com/contentservices-finance.csautosuggest/api/v1/Query?query={}&market=en-us'

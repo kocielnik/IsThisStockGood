@@ -8,7 +8,7 @@ import unittest
 app_path = os.path.join(os.path.dirname(__file__), "..", 'src')
 sys.path.append(app_path)
 
-from src.MSNMoney import MSNMoneyKeyRatios
+from isthisstockgood.DataProviders.MSNMoney import MSNMoneyKeyRatios
 
 class MSNMoneyTest(unittest.TestCase):
 
