@@ -2,7 +2,7 @@
 import sys
 import logging
 import os
-from IsThisStockGood.src.DataFetcher import fetchDataForTickerSymbol
+from isthisstockgood.DataFetcher import fetchDataForTickerSymbol
 logging.basicConfig(level=logging.DEBUG)
 
 ticker = sys.argv[1]
