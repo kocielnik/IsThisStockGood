@@ -12,5 +12,9 @@ requests-futures = "1.0.0"
 
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.poetry.scripts]
+populate_database = 'isthisstockgood.scripts:populate_database'
+test_ticker = 'isthisstockgood.scripts:test_ticker'
