@@ -2,3 +2,5 @@
 old/
 env/
 .env
+# For Pycharm
+.idea
