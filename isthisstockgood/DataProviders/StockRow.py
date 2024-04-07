@@ -72,7 +72,6 @@ class StockRowKeyStats(Base):
       
       total_debts = _get_nested_values_for_key(data_dict, "Total Debt") # Already in USD millions
       self.calculate_total_debt(total_debts)
-<<<<<<<< HEAD:isthisstockgood/DataProviders/StockRow.py
       self.ttm_eps = self.calculate_ttm_eps(data_dict.get('EPSD:A', {}).get('years', []))
       pe_ratios = _get_nested_values_for_key(data_dict, "PE Ratio")
       self.pe_high = max(pe_ratios, default=0)
@@ -80,10 +79,6 @@ class StockRowKeyStats(Base):
     except Exception as e:
       logging.error("Couldn't parse StockRow data")
       logging.debug(traceback.format_exc())
-========
-    except ValueError:
-      logging.error(traceback.format_exc())
->>>>>>>> master:src/Obsolete/StockRow.py
       return False
     return True
 
