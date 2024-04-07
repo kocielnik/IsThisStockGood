@@ -8,8 +8,10 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 flask = "2.3.2"
-lxml = "4.9.1"
 requests-futures = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.3.0"
 
 [build-system]
 requires = ["setuptools>=61.0"]
