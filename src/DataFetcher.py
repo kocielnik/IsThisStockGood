@@ -1,10 +1,10 @@
-import random
 import logging
-import src.RuleOneInvestingCalculations as RuleOne
+import random
+from threading import Lock
 from requests_futures.sessions import FuturesSession
 from src.Active.MSNMoney import MSNMoney
 from src.Active.YahooFinance import YahooFinanceAnalysis
-from threading import Lock
+import src.RuleOneInvestingCalculations as RuleOne
 
 logger = logging.getLogger("IsThisStockGood")
 
@@ -50,13 +50,25 @@ def fetchDataForTickerSymbol(ticker):
 
   msn_money = data_fetcher.msn_money
   yahoo_finance_analysis = data_fetcher.yahoo_finance_analysis
-  # NOTE: Some stocks won't have analyst growth rates, such as newly listed stocks or some foreign stocks.
-  five_year_growth_rate = yahoo_finance_analysis.five_year_growth_rate if yahoo_finance_analysis else 0
+  # NOTE: Some stocks won't have analyst growth rates, such as newly listed
+  # stocks or some foreign stocks.
+  five_year_growth_rate = yahoo_finance_analysis.five_year_growth_rate \
+    if yahoo_finance_analysis else 0
   # TODO: Use TTM EPS instead of most recent year
   margin_of_safety_price, sticker_price = \
-      _calculateMarginOfSafetyPrice(msn_money.equity_growth_rates[-1], msn_money.pe_low, msn_money.pe_high, msn_money.eps[-1], five_year_growth_rate)
-  payback_time = _calculatePaybackTime(msn_money.equity_growth_rates[-1], msn_money.last_year_net_income, msn_money.market_cap, five_year_growth_rate)
-  computed_free_cash_flow = round(float(msn_money.free_cash_flow[-1]) * msn_money.shares_outstanding)
+    _calculateMarginOfSafetyPrice(msn_money.equity_growth_rates[-1],
+                                  msn_money.pe_low, msn_money.pe_high,
+                                  msn_money.eps[-1], five_year_growth_rate
+    )
+  payback_time = _calculatePaybackTime(
+    msn_money.equity_growth_rates[-1],
+    msn_money.last_year_net_income,
+    msn_money.market_cap,
+    five_year_growth_rate
+  )
+  computed_free_cash_flow = round(
+    float(msn_money.free_cash_flow[-1]) * msn_money.shares_outstanding
+  )
   template_values = {
     'ticker' : ticker,
     'name' : msn_money.name if msn_money and msn_money.name else 'null',
@@ -85,23 +97,43 @@ def _calculate_growth_rate_decimal(analyst_growth_rate, current_growth_rate):
   return growth_rate / 100.0
 
 
-def _calculateMarginOfSafetyPrice(one_year_equity_growth_rate, pe_low, pe_high, ttm_eps, analyst_five_year_growth_rate):
-  if not one_year_equity_growth_rate or not pe_low or not pe_high or not ttm_eps or not analyst_five_year_growth_rate:
+def _calculateMarginOfSafetyPrice(
+    one_year_equity_growth_rate,
+    pe_low,
+    pe_high,
+    ttm_eps,
+    analyst_five_year_growth_rate
+  ):
+  if not one_year_equity_growth_rate or not pe_low or not pe_high \
+  or not ttm_eps or not analyst_five_year_growth_rate:
     return None, None
 
-  growth_rate = _calculate_growth_rate_decimal(analyst_five_year_growth_rate, one_year_equity_growth_rate)
+  growth_rate = _calculate_growth_rate_decimal(
+    analyst_five_year_growth_rate, one_year_equity_growth_rate
+  )
   margin_of_safety_price, sticker_price = \
-      RuleOne.margin_of_safety_price(float(ttm_eps), growth_rate, float(pe_low), float(pe_high))
+      RuleOne.margin_of_safety_price(
+        float(ttm_eps), growth_rate, float(pe_low), float(pe_high)
+      )
   return margin_of_safety_price, sticker_price
 
 
-# TODO: Figure out how to get TTM net income instead of previous year net income.
-def _calculatePaybackTime(one_year_equity_growth_rate, last_year_net_income, market_cap, analyst_five_year_growth_rate):
-  if not one_year_equity_growth_rate or not last_year_net_income or not market_cap or not analyst_five_year_growth_rate:
+# TODO: Figure out how to get TTM net income instead of previous year net
+# income.
+def _calculatePaybackTime(
+    one_year_equity_growth_rate, last_year_net_income, market_cap,
+    analyst_five_year_growth_rate
+  ):
+  if not one_year_equity_growth_rate or not last_year_net_income \
+  or not market_cap or not analyst_five_year_growth_rate:
     return None
 
-  growth_rate = _calculate_growth_rate_decimal(analyst_five_year_growth_rate, one_year_equity_growth_rate)
-  payback_time = RuleOne.payback_time(market_cap, last_year_net_income, growth_rate)
+  growth_rate = _calculate_growth_rate_decimal(
+    analyst_five_year_growth_rate, one_year_equity_growth_rate
+  )
+  payback_time = RuleOne.payback_time(
+    market_cap, last_year_net_income, growth_rate
+  )
   return payback_time
 
 
