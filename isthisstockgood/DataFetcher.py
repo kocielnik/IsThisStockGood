@@ -38,9 +38,15 @@ def fetchDataForTickerSymbol(ticker):
   data_fetcher = DataFetcher()
   data_fetcher.ticker_symbol = ticker
 
+  msn_ticker = ticker
+
+  if ticker.endswith(".AS"):
+      msn_ticker = ticker[:-3]
+
   # Make all network request asynchronously to build their portion of
   # the json results.
-  data_fetcher.fetch_msn_money_data()
+  print(msn_ticker)
+  data_fetcher.fetch_msn_money_data(msn_ticker)
   data_fetcher.fetch_yahoo_finance_analysis()
 
 
@@ -132,13 +138,13 @@ class DataFetcher():
     })
     return session
 
-  def fetch_msn_money_data(self):
+  def fetch_msn_money_data(self, ticker):
     """
     Fetching PE Ratios to calculate Sticker Price and Safety Margin Price. As well as
     the "Big 5" growth rate numbers.
     First we need to get an internal MSN stock id for a ticker and then fetch the data.
     """
-    self.msn_money = MSNMoney(self.ticker_symbol)
+    self.msn_money = MSNMoney(ticker)
     session = self._create_session()
     rpc = session.get(self.msn_money.get_ticker_autocomplete_url(), allow_redirects=True, hooks={
        'response': self.continue_fetching_msn_money_data,

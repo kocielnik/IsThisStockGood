@@ -2,6 +2,14 @@ from isthisstockgood.CompanyInfo import CompanyInfo
 from isthisstockgood.DataFetcher import DataFetcher
 
 
+def test_foreign_stock_sticker_price():
+    test_ticker = 'INPST'
+
+    data = get_yahoo_data(test_ticker)
+
+    assert data.ticker_symbol == test_ticker
+    assert float(data.five_year_growth_rate) > 0.0
+
 def test_msn_money():
     test_ticker = 'MSFT'
     test_name = 'Microsoft Corp'

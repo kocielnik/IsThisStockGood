@@ -53,6 +53,7 @@ class MSNMoney:
   def extract_stock_id(self, content):
     data = json.loads(content)
     for ticker in data.get('data', {}).get('stocks', []):
+      print(ticker)
       js = json.loads(ticker)
       if js.get('RT00S', '').upper() == self.ticker_symbol.upper():
         self.description = js.get('Description', '')
