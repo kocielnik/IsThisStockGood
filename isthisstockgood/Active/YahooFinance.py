@@ -32,8 +32,19 @@ class YahooFinanceAnalysis:
     self.ticker_symbol = ticker_symbol.replace('.', '-')
     self.url = YahooFinanceAnalysis._construct_url(self.ticker_symbol)
     self.five_year_growth_rate = None
+    self.maintenance_capital_expenditures = None
 
   def parse_analyst_five_year_growth_rate(self, content):
+    tree = html.fromstring(bytes(content, encoding='utf8'))
+    tree_iterator = tree.iter()
+    for element in tree_iterator:
+      text = element.text
+      if text == 'Next 5 Years (per annum)':
+        percentage = YahooFinanceAnalysis._parseNextPercentage(tree_iterator)
+        self.five_year_growth_rate = percentage.rstrip("%") if percentage else None
+    return True if self.five_year_growth_rate else False
+
+  def parse_maintenance_capital_expenditures(self, content):
     tree = html.fromstring(bytes(content, encoding='utf8'))
     tree_iterator = tree.iter()
     for element in tree_iterator:

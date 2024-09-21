@@ -100,3 +100,7 @@ class RuleOneInvestingCalculationsTest(unittest.TestCase):
         long_term_debt_history[i], stockholder_equity_history[i]
       )
       self.assertEqual(expected_roic_history[i], roic_history)
+
+  def test_calculate_ten_cap_price(self):
+    net_income_history = [400, 200, 100, 50, 20]
+    ten_cap_price = RuleOne.calculate_ten_cap_price(net_income_history)
