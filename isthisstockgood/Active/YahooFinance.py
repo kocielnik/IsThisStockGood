@@ -33,6 +33,7 @@ class YahooFinanceAnalysis:
     self.url = YahooFinanceAnalysis._construct_url(self.ticker_symbol)
     self.five_year_growth_rate = None
     self.maintenance_capital_expenditures = None
+    self.errors = []
 
   def parse_analyst_five_year_growth_rate(self, content):
     tree = html.fromstring(bytes(content, encoding='utf8'))

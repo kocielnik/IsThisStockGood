@@ -208,8 +208,10 @@ class DataFetcher():
   # `fetch_yahoo_finance_analysis`.
   def parse_yahoo_finance_analysis(self, response, *args, **kwargs):
     if response.status_code != 200:
+      self.yahoo_finance_analysis.errors.append(response.text)
       return
     if not self.yahoo_finance_analysis:
+      self.yahoo_finance_analysis.errors.append("No data arrived.")
       return
     result = response.text
     success = self.yahoo_finance_analysis.parse_analyst_five_year_growth_rate(result)
