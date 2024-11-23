@@ -8,14 +8,14 @@ class Zacks:
         self.ticker_symbol = ticker_symbol
         self.five_year_growth_rate = None
         self.maintenance_capital_expenditures = None
-        self.errors = []
 
     def parse(self, response, **kwargs):
         if response.status_code != 200:
-          self.errors.append(response.text)
+          print(f"{response.status_code}: {response.text}")
           return
+
         if not response.text:
-          self.errors.append("No data arrived.")
+          print("Response was empty")
           return
 
         try:
@@ -35,7 +35,7 @@ class Zacks:
       try:
         result = float(estimate)
       except TypeError:
-        self.errors.append(
+        print(
           "Unable to parse growth estimate from: {text}"
         )
 

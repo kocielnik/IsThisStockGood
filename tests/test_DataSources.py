@@ -39,7 +39,6 @@ def test_future_growth_rate():
     data = get_growth_rate(test_ticker)
 
     assert data.ticker_symbol == test_ticker
-    assert data.errors == []
     assert float(data.five_year_growth_rate) > 0.0
 
 def get_msn_money_data(ticker):
