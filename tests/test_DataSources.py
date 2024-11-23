@@ -67,4 +67,4 @@ def get_growth_rate(ticker):
     for rpc in data_fetcher.rpcs:
       rpc.result()
 
-    return data_fetcher.yahoo_finance_analysis
+    return data_fetcher.future_growth_rate
