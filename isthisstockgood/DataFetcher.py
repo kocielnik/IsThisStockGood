@@ -42,7 +42,7 @@ def fetchDataForTickerSymbol(ticker):
   # Make all network request asynchronously to build their portion of
   # the json results.
   data_fetcher.fetch_msn_money_data()
-  data_fetcher.fetch_yahoo_finance_analysis()
+  data_fetcher.fetch_growth_rate()
 
 
   # Wait for each RPC result before proceeding.
