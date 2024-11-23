@@ -4,6 +4,7 @@ import isthisstockgood.RuleOneInvestingCalculations as RuleOne
 from requests_futures.sessions import FuturesSession
 from isthisstockgood.Active.MSNMoney import MSNMoney
 from isthisstockgood.Active.YahooFinance import YahooFinanceAnalysis
+from isthisstockgood.Active.Zacks import Zacks
 from threading import Lock
 
 logger = logging.getLogger("IsThisStockGood")
@@ -202,6 +203,19 @@ class DataFetcher():
     rpc = session.get(self.yahoo_finance_analysis.url, allow_redirects=True, hooks={
        'response': self.parse_yahoo_finance_analysis,
     })
+    self.rpcs.append(rpc)
+
+  def fetch_growth_rate(self):
+    session = self._create_session()
+    self.yahoo_finance_analysis = Zacks(self.ticker_symbol)
+
+    rpc = session.get(
+      self.yahoo_finance_analysis.url,
+      allow_redirects=True,
+      hooks={
+       'response': self.yahoo_finance_analysis.parse,
+      }
+    )
     self.rpcs.append(rpc)
 
   # Called asynchronously upon completion of the URL fetch from
