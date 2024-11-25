@@ -23,12 +23,18 @@ class Zacks:
         except:
           self.five_year_growth_rate = None
 
+    def get_estimate(self, lines, title):
+      for i, line in enumerate(lines):
+          if title in line:
+              return lines[i+1]
+
     def get_growth_rate(self, text):
       lines = text.split("\n")
 
-      for i, line in enumerate(lines):
-          if "Next 5 Years" in line:
-              result = lines[i+1]
+      result = self.get_estimate(lines, "Next 5 Years")
+
+      if "NA" in result:
+          result = self.get_estimate(lines, "Next Year")
 
       estimate = re.sub(r"[^\d\.]", "", result)
 

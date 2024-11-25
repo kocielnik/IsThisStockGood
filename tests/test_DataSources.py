@@ -43,3 +43,16 @@ def test_future_growth_rate():
 
     assert data.ticker_symbol == test_ticker
     assert float(data.five_year_growth_rate) > 0.0
+
+def test_future_growth_rate_falls_back():
+    """
+    If the estimate for the next 5 years is not available,
+    let's fall back to half of the estimate for the next year.
+    """
+    test_ticker = 'DAVA'
+    test_name = 'Endava'
+
+    data = get_growth_rate(test_ticker)
+
+    assert data.ticker_symbol == test_ticker
+    assert float(data.five_year_growth_rate) > 0.0
