@@ -1,7 +1,7 @@
-from isthisstockgood.DataFetcher import DataFetcher
 from isthisstockgood.utils import (
     get_growth_rate,
-    get_msn_money_data
+    get_msn_money_data,
+    get_yahoo_growth_estimate
 )
 
 
@@ -53,6 +53,15 @@ def test_future_growth_rate_falls_back():
     test_name = 'Endava'
 
     data = get_growth_rate(test_ticker)
+
+    assert data.ticker_symbol == test_ticker
+    assert float(data.five_year_growth_rate) > 0.0
+
+def test_yahoo_growth_rate():
+    test_ticker = 'MSFT'
+    test_name = 'Microsoft'
+
+    data = get_yahoo_growth_estimate(test_ticker)
 
     assert data.ticker_symbol == test_ticker
     assert float(data.five_year_growth_rate) > 0.0

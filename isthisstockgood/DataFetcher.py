@@ -5,6 +5,7 @@ from requests_futures.sessions import FuturesSession
 from isthisstockgood.Active.MSNMoney import MSNMoney
 from isthisstockgood.Active.YahooFinance import YahooFinanceAnalysis
 from isthisstockgood.Active.Zacks import Zacks
+from isthisstockgood.Active.InternetArchive import InternetArchive
 from threading import Lock
 
 logger = logging.getLogger("IsThisStockGood")
@@ -198,8 +199,8 @@ class DataFetcher():
     self.msn_money.parse_annual_report_data(result)
 
   def fetch_growth_rate_estimate(self):
-    self.future_growth_rate = YahooFinanceAnalysis(self.ticker_symbol)
     session = self._create_session()
+    self.future_growth_rate = YahooFinanceAnalysis(self.ticker_symbol, session)
     rpc = session.get(self.future_growth_rate.url, allow_redirects=True, hooks={
        'response': self.parse_growth_rate_estimate,
     })

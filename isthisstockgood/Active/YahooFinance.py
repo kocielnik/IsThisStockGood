@@ -8,8 +8,15 @@ class YahooFinanceAnalysis:
   URL_TEMPLATE = 'https://finance.yahoo.com/quote/{}/analysis?p={}'
 
   @classmethod
-  def _construct_url(cls, ticker_symbol):
-    return cls.URL_TEMPLATE.format(ticker_symbol, ticker_symbol)
+  def _construct_url(cls, ticker_symbol, session):
+    url = cls.URL_TEMPLATE.format(ticker_symbol, ticker_symbol)
+    archive_url = f"http://archive.org/wayback/available?url={url}"
+
+    res = session.get(archive_url).result()
+
+    last_snapshot_url = res.json()['archived_snapshots']['closest']['url']
+
+    return last_snapshot_url
 
   @classmethod
   def _isPercentage(cls, text):
@@ -28,9 +35,11 @@ class YahooFinanceAnalysis:
     except:  # End of iteration
       return None
 
-  def __init__(self, ticker_symbol):
+  def __init__(self, ticker_symbol, session):
     self.ticker_symbol = ticker_symbol.replace('.', '-')
-    self.url = YahooFinanceAnalysis._construct_url(self.ticker_symbol)
+    self.url = YahooFinanceAnalysis._construct_url(
+        self.ticker_symbol, session
+    )
     self.five_year_growth_rate = None
 
   def parse_analyst_five_year_growth_rate(self, content):
