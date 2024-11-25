@@ -5,7 +5,6 @@ from requests_futures.sessions import FuturesSession
 from isthisstockgood.Active.MSNMoney import MSNMoney
 from isthisstockgood.Active.YahooFinance import YahooFinanceAnalysis
 from isthisstockgood.Active.Zacks import Zacks
-from isthisstockgood.Active.InternetArchive import InternetArchive
 from threading import Lock
 
 logger = logging.getLogger("IsThisStockGood")
