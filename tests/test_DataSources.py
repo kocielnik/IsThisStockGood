@@ -1,5 +1,8 @@
-from isthisstockgood.CompanyInfo import CompanyInfo
 from isthisstockgood.DataFetcher import DataFetcher
+from isthisstockgood.utils import (
+    get_growth_rate,
+    get_msn_money_data
+)
 
 
 def test_msn_money():
@@ -40,31 +43,3 @@ def test_future_growth_rate():
 
     assert data.ticker_symbol == test_ticker
     assert float(data.five_year_growth_rate) > 0.0
-
-def get_msn_money_data(ticker):
-    data_fetcher = DataFetcher()
-    data_fetcher.ticker_symbol = ticker
-
-    # Make all network request asynchronously to build their portion of
-    # the json results.
-    data_fetcher.fetch_msn_money_data()
-
-    # Wait for each RPC result before proceeding.
-    for rpc in data_fetcher.rpcs:
-      rpc.result()
-
-    return CompanyInfo(**vars(data_fetcher.msn_money))
-
-def get_growth_rate(ticker):
-    data_fetcher = DataFetcher()
-    data_fetcher.ticker_symbol = ticker
-
-    # Make all network request asynchronously to build their portion of
-    # the json results.
-    data_fetcher.fetch_growth_rate()
-
-    # Wait for each RPC result before proceeding.
-    for rpc in data_fetcher.rpcs:
-      rpc.result()
-
-    return data_fetcher.future_growth_rate
