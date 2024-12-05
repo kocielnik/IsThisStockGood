@@ -11,11 +11,9 @@ class Zacks:
 
     def parse(self, response, **kwargs):
         if response.status_code != 200:
-          print(f"{response.status_code}: {response.text}")
           return
 
         if not response.text:
-          print("Response was empty")
           return
 
         try:
@@ -31,12 +29,4 @@ class Zacks:
               result = lines[i+1]
 
       estimate = re.sub(r"[^\d\.]", "", result)
-
-      try:
-        result = float(estimate)
-      except TypeError:
-        print(
-          "Unable to parse growth estimate from: {text}"
-        )
-
       return float(estimate)

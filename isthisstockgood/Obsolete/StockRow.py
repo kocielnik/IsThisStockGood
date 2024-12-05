@@ -44,7 +44,6 @@ class StockRowKeyStats:
 
   def parse_json_data(self, data):
     try:
-      print(data)
       json_data = json.loads(data)
       data_dict = {}
       rows = json_data.get("fundamentals", {}).get("rows", [])
