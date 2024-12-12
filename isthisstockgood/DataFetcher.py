@@ -9,78 +9,81 @@ from threading import Lock
 logger = logging.getLogger("IsThisStockGood")
 
 
-def fetchDataForTickerSymbol(ticker):
-  """Fetches and parses all of the financial data for the `ticker`.
+class Collector:
+    def __init__(self, Session):
+        self.data_fetcher = DataFetcher(Session=Session)
 
-    Args:
-      ticker: The ticker symbol string.
+    def collect(self, ticker):
+      """Fetches and parses all of the financial data for the `ticker`.
 
-    Returns:
-      Returns a dictionary of all the processed financial data. If
-      there's an error, return None.
+        Args:
+          ticker: The ticker symbol string.
 
-      Keys include:
-        'roic',
-        'eps',
-        'sales',
-        'equity',
-        'cash',
-        'long_term_debt',
-        'free_cash_flow',
-        'debt_payoff_time',
-        'debt_equity_ratio',
-        'margin_of_safety_price',
-        'current_price'
-        'ten_cap_price'
-  """
-  if not ticker:
-    return None
+        Returns:
+          Returns a dictionary of all the processed financial data. If
+          there's an error, return None.
 
-  data_fetcher = DataFetcher()
-  data_fetcher.ticker_symbol = ticker
+          Keys include:
+            'roic',
+            'eps',
+            'sales',
+            'equity',
+            'cash',
+            'long_term_debt',
+            'free_cash_flow',
+            'debt_payoff_time',
+            'debt_equity_ratio',
+            'margin_of_safety_price',
+            'current_price'
+            'ten_cap_price'
+      """
+      if not ticker:
+        return None
 
-  # Make all network request asynchronously to build their portion of
-  # the json results.
-  data_fetcher.fetch_msn_money_data()
-  data_fetcher.fetch_yahoo_finance_analysis()
+      self.data_fetcher.ticker_symbol = ticker
+
+      # Make all network request asynchronously to build their portion of
+      # the json results.
+      self.data_fetcher.fetch_msn_money_data()
+      self.data_fetcher.fetch_yahoo_finance_analysis()
 
 
-  # Wait for each RPC result before proceeding.
-  for rpc in data_fetcher.rpcs:
-    rpc.result()
+      # Wait for each RPC result before proceeding.
+      for rpc in self.data_fetcher.rpcs:
+        rpc.result()
 
-  msn_money = data_fetcher.msn_money
-  yahoo_finance_analysis = data_fetcher.yahoo_finance_analysis
-  # NOTE: Some stocks won't have analyst growth rates, such as newly listed stocks or some foreign stocks.
-  five_year_growth_rate = yahoo_finance_analysis.five_year_growth_rate if yahoo_finance_analysis else 0
-  # TODO: Use TTM EPS instead of most recent year
-  margin_of_safety_price, sticker_price = \
-      _calculateMarginOfSafetyPrice(msn_money.equity_growth_rates[-1], msn_money.pe_low, msn_money.pe_high, msn_money.eps[-1], five_year_growth_rate)
-  payback_time = _calculatePaybackTime(msn_money.equity_growth_rates[-1], msn_money.last_year_net_income, msn_money.market_cap, five_year_growth_rate)
-  free_cash_flow_per_share = float(msn_money.free_cash_flow[-1])
-  computed_free_cash_flow = round(free_cash_flow_per_share * msn_money.shares_outstanding)
-  ten_cap_price = 10 * free_cash_flow_per_share
-  template_values = {
-    'ticker' : ticker,
-    'name' : msn_money.name if msn_money and msn_money.name else 'null',
-    'description': msn_money.description if msn_money and msn_money.description else 'null',
-    'roic': msn_money.roic_averages if msn_money and msn_money.roic_averages else [],
-    'eps': msn_money.eps_growth_rates if msn_money and msn_money.eps_growth_rates else [],
-    'sales': msn_money.revenue_growth_rates if msn_money and msn_money.revenue_growth_rates else [],
-    'equity': msn_money.equity_growth_rates if msn_money and msn_money.equity_growth_rates else [],
-    'cash': msn_money.free_cash_flow_growth_rates if msn_money and msn_money.free_cash_flow_growth_rates else [],
-    'total_debt' : msn_money.total_debt,
-    'free_cash_flow' : computed_free_cash_flow,
-    'ten_cap_price' : round(ten_cap_price, 2),
-    'debt_payoff_time' : round(float(msn_money.total_debt) / computed_free_cash_flow),
-    'debt_equity_ratio' : msn_money.debt_equity_ratio if msn_money and msn_money.debt_equity_ratio >= 0 else -1,
-    'margin_of_safety_price' : margin_of_safety_price if margin_of_safety_price else 'null',
-    'current_price' : msn_money.current_price if msn_money and msn_money.current_price else 'null',
-    'sticker_price' : sticker_price if sticker_price else 'null',
-    'payback_time' : payback_time if payback_time else 'null',
-    'average_volume' : msn_money.average_volume if msn_money and msn_money.average_volume else 'null'
-  }
-  return template_values
+      msn_money = self.data_fetcher.msn_money
+      yahoo_finance_analysis = self.data_fetcher.yahoo_finance_analysis
+      # NOTE: Some stocks won't have analyst growth rates, such as newly listed stocks or some foreign stocks.
+      five_year_growth_rate = yahoo_finance_analysis.five_year_growth_rate if yahoo_finance_analysis else 0
+      # TODO: Use TTM EPS instead of most recent year
+      margin_of_safety_price, sticker_price = \
+          _calculateMarginOfSafetyPrice(msn_money.equity_growth_rates[-1], msn_money.pe_low, msn_money.pe_high, msn_money.eps[-1], five_year_growth_rate)
+      payback_time = _calculatePaybackTime(msn_money.equity_growth_rates[-1], msn_money.last_year_net_income, msn_money.market_cap, five_year_growth_rate)
+      free_cash_flow_per_share = float(msn_money.free_cash_flow[-1])
+      computed_free_cash_flow = round(free_cash_flow_per_share * msn_money.shares_outstanding)
+      ten_cap_price = 10 * free_cash_flow_per_share
+      template_values = {
+        'ticker' : ticker,
+        'name' : msn_money.name if msn_money and msn_money.name else 'null',
+        'description': msn_money.description if msn_money and msn_money.description else 'null',
+        'roic': msn_money.roic_averages if msn_money and msn_money.roic_averages else [],
+        'eps': msn_money.eps_growth_rates if msn_money and msn_money.eps_growth_rates else [],
+        'sales': msn_money.revenue_growth_rates if msn_money and msn_money.revenue_growth_rates else [],
+        'equity': msn_money.equity_growth_rates if msn_money and msn_money.equity_growth_rates else [],
+        'cash': msn_money.free_cash_flow_growth_rates if msn_money and msn_money.free_cash_flow_growth_rates else [],
+        'total_debt' : msn_money.total_debt,
+        'free_cash_flow' : computed_free_cash_flow,
+        'ten_cap_price' : round(ten_cap_price, 2),
+        'debt_payoff_time' : round(float(msn_money.total_debt) / computed_free_cash_flow),
+        'debt_equity_ratio' : msn_money.debt_equity_ratio if msn_money and msn_money.debt_equity_ratio >= 0 else -1,
+        'margin_of_safety_price' : margin_of_safety_price if margin_of_safety_price else 'null',
+        'current_price' : msn_money.current_price if msn_money and msn_money.current_price else 'null',
+        'sticker_price' : sticker_price if sticker_price else 'null',
+        'payback_time' : payback_time if payback_time else 'null',
+        'average_volume' : msn_money.average_volume if msn_money and msn_money.average_volume else 'null'
+      }
+      return template_values
 
 
 def _calculate_growth_rate_decimal(analyst_growth_rate, current_growth_rate):
@@ -120,7 +123,7 @@ class DataFetcher():
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
   ]
 
-  def __init__(self,):
+  def __init__(self, Session=None):
     self.lock = Lock()
     self.rpcs = []
     self.ticker_symbol = ''
@@ -128,9 +131,10 @@ class DataFetcher():
     self.yahoo_finance_analysis = None
     self.yahoo_finance_chart = None
     self.error = False
+    self.Session = Session
 
   def _create_session(self):
-    session = FuturesSession()
+    session = self.Session() if self.Session else FuturesSession()
     session.headers.update({
       'User-Agent' : random.choice(DataFetcher.USER_AGENT_LIST)
     })
