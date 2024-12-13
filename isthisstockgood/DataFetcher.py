@@ -10,7 +10,7 @@ logger = logging.getLogger("IsThisStockGood")
 
 
 class Collector:
-    def __init__(self, Session):
+    def __init__(self, Session=FuturesSession):
         self.data_fetcher = DataFetcher(Session=Session)
 
     def collect(self, ticker):

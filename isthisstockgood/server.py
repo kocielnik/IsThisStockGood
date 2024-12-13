@@ -16,12 +16,12 @@ def get_logger():
 
     return logger
 
-def create_app(data_fetcher):
+def create_app(collector):
     app = Flask(__name__)
 
     @app.route('/api/ticker/nvda')
     def api_ticker():
-      template_values = data_fetcher.fetchDataForTickerSymbol("NVDA")
+      template_values = collector.collect("NVDA")
 
       if not template_values:
         data = render_template('json/error.json', **{'error' : 'Invalid ticker symbol'})
@@ -60,7 +60,7 @@ def create_app(data_fetcher):
         return '<meta http-equiv="refresh" content="0; url=http://isthisstockgood.com" />'
 
       ticker = request.values.get('ticker')
-      template_values = data_fetcher.fetchDataForTickerSymbol(ticker)
+      template_values = collector.collect(ticker)
       if not template_values:
         return render_template('json/error.json', **{'error' : 'Invalid ticker symbol'})
       return render_template('json/stock_data.json', **template_values)

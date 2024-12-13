@@ -1,10 +1,10 @@
 import json
 from isthisstockgood.server import create_app
-from isthisstockgood.DataFetcher import fetchDataForTickerSymbol
+from isthisstockgood.DataFetcher import Collector
 
 
 def test_import_app():
-    app = create_app(fetchDataForTickerSymbol)
+    app = create_app(Collector())
 
     with app.test_client() as test_client:
         test_client = app.test_client()
@@ -14,7 +14,7 @@ def test_import_app():
         assert res.status_code == 200
 
 def test_get_data():
-    app = create_app(fetchDataForTickerSymbol)
+    app = create_app(Collector())
 
     with app.test_client() as test_client:
         test_client = app.test_client()
@@ -25,7 +25,7 @@ def test_get_data():
         assert res.json['debt_payoff_time'] >= 0
 
 def test_get_ten_cap_price():
-    app = create_app(fetchDataForTickerSymbol)
+    app = create_app(Collector())
 
     with app.test_client() as test_client:
         test_client = app.test_client()
@@ -33,7 +33,7 @@ def test_get_ten_cap_price():
         assert res.json['ten_cap_price'] > 0
 
 def test_ten_cap_price_has_two_places_precision():
-    app = create_app(fetchDataForTickerSymbol)
+    app = create_app(Collector())
 
     with app.test_client() as test_client:
         test_client = app.test_client()
