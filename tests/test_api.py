@@ -1,6 +1,27 @@
 import json
+from dataclasses import dataclass
 from isthisstockgood.server import create_app
 from isthisstockgood.DataFetcher import Collector
+
+
+class RPC:
+    def result(self):
+        return {
+          'companyMetrics' : [self.get_bvps(year) for year in range(10)]
+        }
+
+    def get_bvps(self, year):
+        return {
+          'fiscalPeriodType' : 'Annual',
+          'bookValuePerShare' : year
+        }
+
+
+class MockSession:
+    headers: dict = {}
+
+    def get(self, *args, **kwargs):
+        return RPC()
 
 
 def test_import_app():
