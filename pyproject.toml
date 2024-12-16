@@ -12,6 +12,7 @@ wheel = "^0.43.0"
 lxml = "^5.2.2"
 flask = "3.0.3"
 virtualenv = "^20.26.2"
+gunicorn = "^23.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.1"
