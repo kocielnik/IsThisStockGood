@@ -2,7 +2,7 @@
   "devCommand": "gunicorn main",
   "builds": [
     {
-      "src": "/main.py",
+      "src": "main.py",
       "use": "@vercel/python"
     }
   ],
