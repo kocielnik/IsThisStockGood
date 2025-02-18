@@ -37,8 +37,7 @@ def fetchDataForTickerSymbol(ticker):
   if not ticker:
     return None
 
-  data_fetcher = DataFetcher()
-  data_fetcher.ticker_symbol = ticker
+  data_fetcher = DataFetcher(ticker)
 
   # Make all network request asynchronously to build their portion of
   # the json results.
@@ -59,9 +58,13 @@ def fetchDataForTickerSymbol(ticker):
       yahoo_finance_analysis.five_year_growth_rate if yahoo_finance_analysis \
       else zacks_analysis.five_year_growth_rate if zacks_analysis \
       else 0
-  # TODO: Use TTM EPS instead of most recent year
-  margin_of_safety_price, sticker_price = \
-      _calculateMarginOfSafetyPrice(msn_money.equity_growth_rates[-1], msn_money.pe_low, msn_money.pe_high, msn_money.eps[-1], five_year_growth_rate)
+  margin_of_safety_price, sticker_price = _calculateMarginOfSafetyPrice(
+          msn_money.equity_growth_rates[-1],
+          msn_money.pe_low,
+          msn_money.pe_high,
+          sum(msn_money.quarterly_eps[-4:]),
+          five_year_growth_rate
+      )
   payback_time = _calculatePaybackTime(msn_money.equity_growth_rates[-1], msn_money.last_year_net_income, msn_money.market_cap, five_year_growth_rate)
   free_cash_flow_per_share = float(msn_money.free_cash_flow[-1])
   computed_free_cash_flow = round(free_cash_flow_per_share * msn_money.shares_outstanding)
@@ -105,7 +108,6 @@ def _calculateMarginOfSafetyPrice(one_year_equity_growth_rate, pe_low, pe_high, 
   return margin_of_safety_price, sticker_price
 
 
-# TODO: Figure out how to get TTM net income instead of previous year net income.
 def _calculatePaybackTime(one_year_equity_growth_rate, last_year_net_income, market_cap, analyst_five_year_growth_rate):
   if not one_year_equity_growth_rate or not last_year_net_income or not market_cap or not analyst_five_year_growth_rate:
     return None
@@ -126,10 +128,10 @@ class DataFetcher():
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
   ]
 
-  def __init__(self,):
+  def __init__(self, ticker):
     self.lock = Lock()
     self.rpcs = []
-    self.ticker_symbol = ''
+    self.ticker_symbol = ticker
     self.msn_money = None
     self.yahoo_finance_analysis = None
     self.zacks_analysis = None

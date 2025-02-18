@@ -82,9 +82,6 @@ class MSNMoney:
       return
     self.total_debt = float(most_recent_statement.get('longTermDebt', 0))
     self.shares_outstanding = float(most_recent_statement.get('sharesOutstanding', 0))
-
-    key_metrics = data.get('analysis', {}).get('keyMetrics', {})
-    self.last_year_net_income = key_metrics.get('latestIncome', '')
     
 
   def parse_ratios_data(self, content):
@@ -108,6 +105,16 @@ class MSNMoney:
     
     # Debt
     self._parse_debt_to_equity(quarterly_data)
+
+    # Quarterly EPS for MOSP valuation
+    self.quarterly_eps = _extract_data_for_key(quarterly_data, "earningsPerShare")
+
+    # For Payback Time valuation:
+    # "EPS is calculated by dividing a company's net income
+    # by the total number of outstanding shares."
+    # - https://www.investopedia.com/terms/e/eps.asp
+    ttm_eps = sum(self.quarterly_eps[-4:])
+    self.last_year_net_income =  ttm_eps * self.shares_outstanding
     
     return True
 
