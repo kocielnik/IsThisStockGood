@@ -19,7 +19,7 @@ def test_get_data():
     with app.test_client() as test_client:
         test_client = app.test_client()
 
-        res = test_client.get('/api/ticker/nvda')
+        res = test_client.get('/api/ticker/lulu/1')
         assert res.status_code == 200
 
         data = res.json
@@ -32,7 +32,7 @@ def test_get_ten_cap_price():
 
     with app.test_client() as test_client:
         test_client = app.test_client()
-        res = test_client.get('/api/ticker/nvda')
+        res = test_client.get('/api/ticker/nvda/1')
         assert res.json['ten_cap_price'] > 0
 
 def test_ten_cap_price_has_two_places_precision():
@@ -40,7 +40,7 @@ def test_ten_cap_price_has_two_places_precision():
 
     with app.test_client() as test_client:
         test_client = app.test_client()
-        res = test_client.get('/api/ticker/nvda')
+        res = test_client.get('/api/ticker/nvda/1')
 
         price = res.json['ten_cap_price']
 

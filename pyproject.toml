@@ -1,24 +1,26 @@
-[tool.poetry]
+[project]
 name = "IsThisStockGood"
 version = "0.1.0"
 description = ""
-authors = ["Mark Klara"]
+authors = [{ name = "Mark Klara" }]
+requires-python = "~=3.9"
 readme = "README.md"
+dependencies = [
+    "requests-futures>=1.0.1,<2",
+    "wheel>=0.43.0,<0.44",
+    "lxml>=5.2.2,<6",
+    "flask==3.0.3",
+    "virtualenv>=20.26.6,<21",
+]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-requests-futures = "^1.0.1"
-wheel = "^0.43.0"
-lxml = "^5.2.2"
-flask = "3.0.3"
-virtualenv = "^20.26.6"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.2.1"
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2,<9",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pylint]
 indent-string="  "

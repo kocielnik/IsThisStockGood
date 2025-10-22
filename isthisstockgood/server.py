@@ -1,4 +1,5 @@
 import logging
+import re
 from datetime import date
 from flask import Flask, request, render_template, json
 
@@ -19,9 +20,17 @@ def get_logger():
 def create_app(fetchDataForTickerSymbol):
     app = Flask(__name__)
 
-    @app.route('/api/ticker/nvda')
-    def api_ticker():
-      template_values = fetchDataForTickerSymbol("NVDA")
+    @app.route(
+        '/api/ticker/<unsanitized_ticker>/<unsanitized_growth_estimate>'
+    )
+    def api_ticker(
+        unsanitized_ticker,
+        unsanitized_growth_estimate
+    ):
+      ticker = re.sub(r'\W+', '', unsanitized_ticker)
+      growth_estimate = int(re.sub(r'\W+', '', unsanitized_growth_estimate))
+
+      template_values = fetchDataForTickerSymbol(ticker, growth_estimate=growth_estimate)
 
       if not template_values:
         data = render_template('json/error.json', **{'error' : 'Invalid ticker symbol'})
@@ -60,7 +69,8 @@ def create_app(fetchDataForTickerSymbol):
         return '<meta http-equiv="refresh" content="0; url=http://isthisstockgood.com" />'
 
       ticker = request.values.get('ticker')
-      template_values = fetchDataForTickerSymbol(ticker)
+      custom_growth_rate = request.values.get('custom_growth_rate')
+      template_values = fetchDataForTickerSymbol(ticker, growth_estimate=int(custom_growth_rate))
       if not template_values:
         return render_template('json/error.json', **{'error' : 'Invalid ticker symbol'})
       return render_template('json/stock_data.json', **template_values)

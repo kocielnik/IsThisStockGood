@@ -1,6 +1,8 @@
 import random
 import logging
 import isthisstockgood.RuleOneInvestingCalculations as RuleOne
+from requests.adapters import HTTPAdapter, Retry
+from requests.exceptions import RetryError
 from requests_futures.sessions import FuturesSession
 from isthisstockgood.Active.MSNMoney import MSNMoney
 from isthisstockgood.Active.YahooFinance import YahooFinanceAnalysis
@@ -10,7 +12,7 @@ from threading import Lock
 logger = logging.getLogger("IsThisStockGood")
 
 
-def fetchDataForTickerSymbol(ticker):
+def fetchDataForTickerSymbol(ticker, growth_estimate=None):
   """Fetches and parses all of the financial data for the `ticker`.
 
     Args:
@@ -48,16 +50,22 @@ def fetchDataForTickerSymbol(ticker):
 
   # Wait for each RPC result before proceeding.
   for rpc in data_fetcher.rpcs:
-    rpc.result()
+    try:
+      rpc.result()
+    except RetryError as e:
+      continue
 
   msn_money = data_fetcher.msn_money
   yahoo_finance_analysis = data_fetcher.yahoo_finance_analysis
   zacks_analysis = data_fetcher.zacks_analysis
   # NOTE: Some stocks won't have analyst growth rates, such as newly listed stocks or some foreign stocks.
-  five_year_growth_rate = \
-      yahoo_finance_analysis.five_year_growth_rate if yahoo_finance_analysis \
-      else zacks_analysis.five_year_growth_rate if zacks_analysis \
-      else 0
+  if (yahoo_finance_analysis
+          and yahoo_finance_analysis.five_year_growth_rate is not None):
+      five_year_growth_rate = yahoo_finance_analysis.five_year_growth_rate
+  elif (zacks_analysis and zacks_analysis.five_year_growth_rate is not None):
+      five_year_growth_rate = zacks_analysis.five_year_growth_rate
+  else:
+      five_year_growth_rate = growth_estimate
   margin_of_safety_price, sticker_price = _calculateMarginOfSafetyPrice(
           msn_money.equity_growth_rates[-1],
           msn_money.pe_low,
@@ -143,6 +151,16 @@ class DataFetcher():
     session.headers.update({
       'User-Agent' : random.choice(DataFetcher.USER_AGENT_LIST)
     })
+
+    retries = Retry(
+        total=3,
+        backoff_factor=0.1,
+        status_forcelist=[301]
+    )
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
     return session
 
   def fetch_msn_money_data(self):

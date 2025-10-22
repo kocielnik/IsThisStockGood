@@ -40,11 +40,16 @@ $(document).ready(function() {
       return;
     }
 
+    let $custom_growth_rate = $('#custom-growth-rate').val();
+    if ($custom_growth_rate.length == 0) {
+      $custom_growth_rate = 0;
+    }
+
     // Start loading
     loader.show();
 
     // Post the data to the path.
-    let posting = $.post(path, { ticker: $ticker } );
+    let posting = $.post(path, { ticker: $ticker, custom_growth_rate: $custom_growth_rate } );
 
     posting.fail(function(response) {
     $.snackbar({

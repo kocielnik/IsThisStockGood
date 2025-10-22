@@ -10,6 +10,14 @@
             placeholder="Ticker Symbol"
             maxlength=8/>
       </div>
+      <div class="col-md-2 nopadding">
+        <input
+            type="text"
+            class="form-control"
+            id="custom-growth-rate"
+            placeholder="Custom Growth Rate (percent)"
+            maxlength=8/>
+      </div>
       <div class="col-md-1 nopadding">
         <input
             type="submit"
@@ -25,6 +33,15 @@
 document.querySelector("#ticker").addEventListener("keypress", (event) => {
   let key = event.key;
   if (!key.match(/[A-Za-z,.\-]/)) {
+      event.preventDefault();
+    }
+});
+</script>
+
+<script>
+document.querySelector("#custom-growth-rate").addEventListener("keypress", (event) => {
+  let key = event.key;
+  if (!key.match(/[0-9,.\-]/)) {
       event.preventDefault();
     }
 });
