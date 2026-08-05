@@ -1,0 +1,12 @@
+{
+  "devCommand": "gunicorn main",
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "main.py" }
+  ]
+}
