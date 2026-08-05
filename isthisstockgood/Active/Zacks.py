@@ -33,7 +33,7 @@ class Zacks:
           return float(estimate)
 
       for i, line in enumerate(lines):
-          if "Next Year" in line:
+          if "Next Year (" in line:
               result = lines[i+1]
 
       estimate = re.sub(r"[^\d\.]", "", result)
