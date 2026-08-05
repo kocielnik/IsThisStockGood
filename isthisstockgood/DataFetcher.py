@@ -37,13 +37,13 @@ def fetchDataForTickerSymbol(ticker):
   if not ticker:
     return None
 
-  data_fetcher = DataFetcher()
-  data_fetcher.ticker_symbol = ticker
+  data_fetcher = DataFetcher(ticker)
 
   # Make all network request asynchronously to build their portion of
   # the json results.
   data_fetcher.fetch_msn_money_data()
-  data_fetcher.fetch_growth_rate()
+  data_fetcher.fetch_yahoo_finance_analysis()
+  data_fetcher.fetch_zacks_analysis()
 
 
   # Wait for each RPC result before proceeding.
@@ -51,12 +51,20 @@ def fetchDataForTickerSymbol(ticker):
     rpc.result()
 
   msn_money = data_fetcher.msn_money
-  future_growth_rate = data_fetcher.future_growth_rate
+  yahoo_finance_analysis = data_fetcher.yahoo_finance_analysis
+  zacks_analysis = data_fetcher.zacks_analysis
   # NOTE: Some stocks won't have analyst growth rates, such as newly listed stocks or some foreign stocks.
-  five_year_growth_rate = future_growth_rate.five_year_growth_rate if future_growth_rate else 0
-  # TODO: Use TTM EPS instead of most recent year
-  margin_of_safety_price, sticker_price = \
-      _calculateMarginOfSafetyPrice(msn_money.equity_growth_rates[-1], msn_money.pe_low, msn_money.pe_high, msn_money.eps[-1], five_year_growth_rate)
+  five_year_growth_rate = \
+      yahoo_finance_analysis.five_year_growth_rate if yahoo_finance_analysis \
+      else zacks_analysis.five_year_growth_rate if zacks_analysis \
+      else 0
+  margin_of_safety_price, sticker_price = _calculateMarginOfSafetyPrice(
+          msn_money.equity_growth_rates[-1],
+          msn_money.pe_low,
+          msn_money.pe_high,
+          sum(msn_money.quarterly_eps[-4:]),
+          five_year_growth_rate
+      )
   payback_time = _calculatePaybackTime(msn_money.equity_growth_rates[-1], msn_money.last_year_net_income, msn_money.market_cap, five_year_growth_rate)
   free_cash_flow_per_share = float(msn_money.free_cash_flow[-1])
   computed_free_cash_flow = round(free_cash_flow_per_share * msn_money.shares_outstanding)
@@ -100,7 +108,6 @@ def _calculateMarginOfSafetyPrice(one_year_equity_growth_rate, pe_low, pe_high, 
   return margin_of_safety_price, sticker_price
 
 
-# TODO: Figure out how to get TTM net income instead of previous year net income.
 def _calculatePaybackTime(one_year_equity_growth_rate, last_year_net_income, market_cap, analyst_five_year_growth_rate):
   if not one_year_equity_growth_rate or not last_year_net_income or not market_cap or not analyst_five_year_growth_rate:
     return None
@@ -121,12 +128,13 @@ class DataFetcher():
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
   ]
 
-  def __init__(self,):
+  def __init__(self, ticker):
     self.lock = Lock()
     self.rpcs = []
-    self.ticker_symbol = ''
+    self.ticker_symbol = ticker
     self.msn_money = None
-    self.future_growth_rate = None
+    self.yahoo_finance_analysis = None
+    self.zacks_analysis = None
     self.yahoo_finance_chart = None
     self.error = False
 
@@ -201,38 +209,48 @@ class DataFetcher():
     result = response.text
     self.msn_money.parse_annual_report_data(result)
 
-  def fetch_growth_rate_estimate(self):
-    self.future_growth_rate = YahooFinanceAnalysis(self.ticker_symbol)
+  def fetch_yahoo_finance_analysis(self):
+    self.yahoo_finance_analysis = YahooFinanceAnalysis(self.ticker_symbol)
     session = self._create_session()
-    rpc = session.get(self.future_growth_rate.url, allow_redirects=True, hooks={
-       'response': self.parse_growth_rate_estimate,
+    rpc = session.get(self.yahoo_finance_analysis.url, allow_redirects=True, hooks={
+       'response': self.parse_yahoo_finance_analysis,
     })
     self.rpcs.append(rpc)
 
-  def fetch_growth_rate(self):
+  # Called asynchronously upon completion of the URL fetch from
+  # `fetch_yahoo_finance_analysis`.
+  def parse_yahoo_finance_analysis(self, response, *args, **kwargs):
+    if response.status_code != 200:
+      return
+    if not self.yahoo_finance_analysis:
+      return
+    result = response.text
+    success = self.yahoo_finance_analysis.parse_analyst_five_year_growth_rate(result)
+    if not success:
+      self.yahoo_finance_analysis = None
+
+  def fetch_zacks_analysis(self):
     session = self._create_session()
-    self.future_growth_rate = Zacks(self.ticker_symbol)
+    self.zacks_analysis = Zacks(self.ticker_symbol)
 
     rpc = session.get(
-      self.future_growth_rate.url,
+      self.zacks_analysis.url,
       allow_redirects=True,
       hooks={
-       'response': self.future_growth_rate.parse,
+       'response': self.zacks_analysis.parse,
       }
     )
     self.rpcs.append(rpc)
 
-  # Called asynchronously upon completion of the URL fetch from
-  # `fetch_growth_rate_estimate`.
   def parse_growth_rate_estimate(self, response, *args, **kwargs):
     if response.status_code != 200:
       return
-    if not self.future_growth_rate:
+    if not self.zacks_analysis:
       return
     result = response.text
-    success = self.future_growth_rate.parse_analyst_five_year_growth_rate(result)
+    success = self.zacks_analysis.parse_analyst_five_year_growth_rate(result)
     if not success:
-      self.future_growth_rate = None
+      self.zacks_analysis = None
 
   def fetch_yahoo_finance_chart(self):
     self.yahoo_finance_chart = YahooFinanceChart(self.ticker_symbol)
@@ -243,7 +261,7 @@ class DataFetcher():
     self.rpcs.append(rpc)
 
   # Called asynchronously upon completion of the URL fetch from
-  # `fetch_growth_rate_estimate`.
+  # `fetch_yahoo_finance_analysis`.
   def parse_yahoo_finance_chart(self, response, *args, **kwargs):
     if response.status_code != 200:
       return
